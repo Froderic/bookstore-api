@@ -45,7 +45,7 @@ public class Book {
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock cannot be negative")
     @Column(nullable = false)
-    private Integer stock;
+    private Integer stockQuantity;
 
     @Size(max = 1000, message = "Description cannot exceed 1000 characters")
     @Column(length = 1000)

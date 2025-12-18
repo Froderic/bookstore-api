@@ -38,9 +38,9 @@ public class Customer {
     private String email;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Invalid phone number format")
+    @Pattern(regexp = "^[\\d\\s\\-\\+\\(\\)]+$", message = "Invalid phone number format")
     @Column(nullable = false, length = 20)
-    private String phone;
+    private String phoneNumber;
 
     @Size(max = 200, message = "Address cannot exceed 200 characters")
     @Column(length = 200)
