@@ -1,6 +1,8 @@
 package com.wooseok.bookstore.service;
 
 import com.wooseok.bookstore.dto.BookDTO;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface BookService {
@@ -18,4 +20,9 @@ public interface BookService {
     List<BookDTO> findBooksByAuthor(String author);
 
     List<BookDTO> findBooksByTitle(String title);
+
+
+    List<BookDTO> searchByCategory(String category);
+    List<BookDTO> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice);
+    List<BookDTO> findLowStockBooks(int threshold);
 }

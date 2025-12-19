@@ -4,6 +4,7 @@ import com.wooseok.bookstore.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByCategoryAndStockQuantityGreaterThan(String category, Integer stockQuantity);
 
     List<Book> findByAuthorContainingIgnoreCase(String author);
+
+    List<Book> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
+    List<Book> findByStockQuantityLessThan(int threshold);
 }

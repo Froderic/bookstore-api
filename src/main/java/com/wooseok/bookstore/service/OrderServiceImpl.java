@@ -2,6 +2,7 @@ package com.wooseok.bookstore.service;
 
 import com.wooseok.bookstore.dto.OrderDTO;
 import com.wooseok.bookstore.dto.OrderItemDTO;
+import com.wooseok.bookstore.exception.OrderValidationException;
 import com.wooseok.bookstore.exception.ResourceNotFoundException;
 import com.wooseok.bookstore.model.Book;
 import com.wooseok.bookstore.model.Customer;
@@ -36,7 +37,14 @@ public class OrderServiceImpl implements OrderService {
 
         // Validate bookIds and quantities lists match
         if (bookIds.size() != quantities.size()) {
-            throw new IllegalArgumentException("Book IDs and quantities lists must have the same size");
+            throw new OrderValidationException("Book IDs and quantities lists must have the same size");
+        }
+
+
+
+        // Validate cart is not empty
+        if (bookIds.isEmpty()) {
+            throw new OrderValidationException("Cannot create order with empty cart");
         }
 
         // Create the order
@@ -54,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
 
             // Validate quantity
             if (quantity <= 0) {
-                throw new IllegalArgumentException("Quantity must be greater than 0 for book ID: " + bookId);
+                throw new OrderValidationException("Quantity must be greater than 0 for book ID: " + bookId);
             }
 
             // Find the book

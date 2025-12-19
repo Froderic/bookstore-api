@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,36 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookDTO> findBooksByTitle(String title) {
         return bookRepository.findByTitleContainingIgnoreCase(title).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookDTO> searchByCategory(String category) {
+        List<Book> books = bookRepository.findByCategory(category);
+        return books.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookDTO> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        if (minPrice.compareTo(maxPrice) > 0) {
+            throw new IllegalArgumentException("Minimum price cannot be greater than maximum price");
+        }
+        List<Book> books = bookRepository.findByPriceBetween(minPrice, maxPrice);
+        return books.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookDTO> findLowStockBooks(int threshold) {
+        if (threshold < 0) {
+            throw new IllegalArgumentException("Stock threshold cannot be negative");
+        }
+        List<Book> books = bookRepository.findByStockQuantityLessThan(threshold);
+        return books.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
