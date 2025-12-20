@@ -1,7 +1,10 @@
 package com.wooseok.bookstore.controller;
 
 import com.wooseok.bookstore.dto.OrderDTO;
+import com.wooseok.bookstore.dto.OrderItemDTO;
 import com.wooseok.bookstore.service.OrderService;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +22,20 @@ public class OrderController {
     // Place a new order
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@RequestBody CreateOrderRequest request) {
-        OrderDTO order = orderService.createOrder(
-                request.getCustomerId(),
-                request.getBookIds(),
-                request.getQuantities()
-        );
+        // Convert CreateOrderRequest to OrderDTO for the service layer
+        OrderDTO orderDTO = OrderDTO.builder()
+                .customerId(request.getCustomerId())
+                .items(request.getItems())
+                .build();
+
+        OrderDTO order = orderService.createOrder(orderDTO);
         return new ResponseEntity<>(order, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        List<OrderDTO> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
     }
 
     // Get order by ID
@@ -44,8 +55,10 @@ public class OrderController {
     // Inner class for the request body
     @lombok.Data
     public static class CreateOrderRequest {
+        @NotNull(message = "Customer ID is required")
         private Long customerId;
-        private List<Long> bookIds;
-        private List<Integer> quantities;
+
+        @NotEmpty(message = "Order must contain at least one item")
+        private List<OrderItemDTO> items;
     }
 }

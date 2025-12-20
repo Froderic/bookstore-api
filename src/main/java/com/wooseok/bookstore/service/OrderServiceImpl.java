@@ -30,20 +30,13 @@ public class OrderServiceImpl implements OrderService {
     private final BookRepository bookRepository;
 
     @Override
-    public OrderDTO createOrder(Long customerId, List<Long> bookIds, List<Integer> quantities) {
+    public OrderDTO createOrder(OrderDTO orderDTO) {
         // Validate customer exists
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", customerId));
-
-        // Validate bookIds and quantities lists match
-        if (bookIds.size() != quantities.size()) {
-            throw new OrderValidationException("Book IDs and quantities lists must have the same size");
-        }
-
-
+        Customer customer = customerRepository.findById(orderDTO.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", orderDTO.getCustomerId()));
 
         // Validate cart is not empty
-        if (bookIds.isEmpty()) {
+        if (orderDTO.getItems() == null || orderDTO.getItems().isEmpty()) {
             throw new OrderValidationException("Cannot create order with empty cart");
         }
 
@@ -55,42 +48,39 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        // Process each book in the order
-        for (int i = 0; i < bookIds.size(); i++) {
-            Long bookId = bookIds.get(i);
-            Integer quantity = quantities.get(i);
-
+        // Process each item in the order
+        for (OrderItemDTO itemDTO : orderDTO.getItems()) {
             // Validate quantity
-            if (quantity <= 0) {
-                throw new OrderValidationException("Quantity must be greater than 0 for book ID: " + bookId);
+            if (itemDTO.getQuantity() <= 0) {
+                throw new OrderValidationException("Quantity must be greater than 0 for book ID: " + itemDTO.getBookId());
             }
 
             // Find the book
-            Book book = bookRepository.findById(bookId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+            Book book = bookRepository.findById(itemDTO.getBookId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Book", "id", itemDTO.getBookId()));
 
             // Check stock availability
-            if (book.getStockQuantity() < quantity) {
+            if (book.getStockQuantity() < itemDTO.getQuantity()) {
                 throw new IllegalArgumentException(
                         "Insufficient stock for book: " + book.getTitle() +
-                                ". Available: " + book.getStockQuantity() + ", Requested: " + quantity);
+                                ". Available: " + book.getStockQuantity() + ", Requested: " + itemDTO.getQuantity());
             }
 
             // Reduce stock
-            book.setStockQuantity(book.getStockQuantity() - quantity);
+            book.setStockQuantity(book.getStockQuantity() - itemDTO.getQuantity());
             bookRepository.save(book);
 
             // Create order item
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setBook(book);
-            orderItem.setQuantity(quantity);
+            orderItem.setQuantity(itemDTO.getQuantity());
             orderItem.setPrice(book.getPrice());
 
             orderItems.add(orderItem);
 
             // Calculate subtotal and add to total
-            BigDecimal subtotal = book.getPrice().multiply(BigDecimal.valueOf(quantity));
+            BigDecimal subtotal = book.getPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity()));
             totalAmount = totalAmount.add(subtotal);
         }
 
@@ -101,6 +91,14 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         return mapToDTO(savedOrder);
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

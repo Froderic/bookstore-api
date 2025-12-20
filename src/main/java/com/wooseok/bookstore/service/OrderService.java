@@ -5,7 +5,8 @@ import com.wooseok.bookstore.dto.OrderDTO;
 import java.util.List;
 
 public interface OrderService {
-    OrderDTO createOrder(Long customerId, List<Long> bookIds, List<Integer> quantities);
+    OrderDTO createOrder(OrderDTO orderDTO);
     OrderDTO getOrderById(Long orderId);
     List<OrderDTO> getCustomerOrders(Long customerId);
+    List<OrderDTO> getAllOrders();
 }
