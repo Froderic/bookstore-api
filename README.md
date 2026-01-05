@@ -483,7 +483,7 @@ Import `Bookstore_API.postman_collection.json` for comprehensive API testing.
 ## Development Timeline
 
 **Week 4 (Dec 16-21):**
-- Mon: Database schema, 5 entities, JPA relationships
+- Mon: Database schema, 4 entities, JPA relationships
 - Tue: DTOs, services, Book & Customer endpoints
 - Wed: Order processing with inventory management
 - Thu: Advanced queries, global exception handling
