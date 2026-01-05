@@ -1,6 +1,6 @@
 # Bookstore Backend API
 
-A production-ready RESTful backend API for managing a bookstore system with multi-entity relationships, order processing, and inventory tracking. Built with Spring Boot and PostgreSQL.
+A RESTful backend API for managing a bookstore system with multi-entity relationships, order processing, and inventory tracking. Built with Spring Boot and PostgreSQL.
 
 ## Features
 
