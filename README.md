@@ -496,7 +496,7 @@ Import `Bookstore_API.postman_collection.json` for comprehensive API testing.
 
 **Woo Seok Lee** | [GitHub: @Froderic](https://github.com/Froderic)  
 Backend Developer | wooseoklee26@gmail.com  
-December 2024
+December 2025
 
 ## Technical Highlights
 
